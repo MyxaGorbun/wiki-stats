@@ -20,23 +20,38 @@ class WikiGraph:
         print('Загружаю граф из файла: ' + filename)
 
         with open(filename) as f:
-            (n, _nlinks) = (0, 0) # TODO: прочитать из файла
-            
+            a = f.readline()
+            a.strip()
+            a = list(map(int, a.split(' ')))
+            nodes, _nlinks = a[0], a[1]
+            n = nodes
+            i = 0
             self._titles = []
             self._sizes = array.array('L', [0]*n)
             self._links = array.array('L', [0]*_nlinks)
             self._redirect = array.array('B', [0]*n)
             self._offset = array.array('L', [0]*(n+1))
 
-            # TODO: прочитать граф из файла
-
+            while nodes != 0:
+                a = f.readline()
+                nodes -= 1
+                self._titles.append(a)
+                a = f.readline()
+                a = list(a.split(' '))
+                self._sizes[n - nodes] = int(a[0])
+                self._redirect[n - nodes] = int(a[1])
+                a = int(a[2])
+                i+=a
+                while a != 0:
+                    self._links[i-a] = int(f.readline())
+                    a -= 1
         print('Граф загружен')
 
     def get_number_of_links_from(self, _id):
-        pass
+        return(self._offset[_id+1] - self._offset[_id])
 
     def get_links_from(self, _id):
-        pass
+        return()
 
     def get_id(self, title):
         pass
@@ -60,16 +75,7 @@ def hist(fname, data, bins, xlabel, ylabel, title, facecolor='green', alpha=0.5,
 
 
 if __name__ == '__main__':
-
-    if len(sys.argv) != 2:
-        print('Использование: wiki_stats.py <файл с графом статей>')
-        sys.exit(-1)
-
-    if os.path.isfile(sys.argv[1]):
-        wg = WikiGraph()
-        wg.load_from_file(sys.argv[1])
-    else:
-        print('Файл с графом не найден')
-        sys.exit(-1)
+    wg = WikiGraph()
+    wg.load_from_file('wiki_small.txt')
 
     # TODO: статистика и гистограммы
